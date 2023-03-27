@@ -1,10 +1,15 @@
 <script lang="ts">
     import { Artifact } from "../artifacts/artifactModel";
+    import ArtifactView from "../artifacts/artifactView.svelte";
     import { dataSheet } from "../dataSheet";
-  import InfoView from "../views/infoView.svelte";
+    import {slide} from "svelte/transition";
+
+    let lastOutcrop: null | Artifact[] = null;
+    let artifactPreview: null | Artifact = null;
+
     const farmArtifacts = () => {
         console.clear();
-        const farmReturn = {3: [], 4: [], 5: []};
+        const farmReturn = {5: [], 4: [], 3: []};
         const dropRates = dataSheet.domains.dropRates.max;
         for(const [rarity, dropRate] of Object.entries(dropRates)){
             let dropRateTmp = dropRate;
@@ -16,11 +21,14 @@
                 farmReturn[rarity].push(new Artifact(selectedDomainInfo.artifactSets[rarity], Number(rarity)));
             }
         }
-
+        const tmpArr = [];
         for(const [tier, artifacts] of Object.entries(farmReturn)){
             console.log(`Rarity: ${tier}`);
-            for(const artifact of artifacts) artifact.print();
+            for(const artifact of artifacts) tmpArr.push(artifact);
         }
+        lastOutcrop = tmpArr.sort((a, b)=>{
+            return a.rarity > b.rarity ? -1 : 1;
+        });
     }
     let selectedDomainName = "Momiji-Dyed Court";
     let selectedDomainInfo = dataSheet.domains.domainsInfo[selectedDomainName];
@@ -40,6 +48,10 @@
     }
     const clearArtifactInfo = () => {
 
+    }
+
+    const showPreviewArtifact = (artifact: Artifact) => {
+        artifactPreview = artifact;
     }
 </script>
 
@@ -128,6 +140,40 @@
         font-size: 1.5rem;
 
     }
+    .outcropViewWrap{
+        position: fixed;
+        background-color: #000000a8;
+        width: 100vw;
+        height: 100vh;
+        top: 0; left: 0;
+        backdrop-filter: blur(5px);
+    }
+    .outcropContainer{
+        position: fixed;
+        left: 0; top: 50%;
+        width: 100vw;
+        transform: translate(0, -50%);
+        background-color: #b3af7a;
+        display: flex;
+        justify-content: center;
+    }
+    .outcropContainer>.artifactImgWrap{
+        width: 60px;
+        aspect-ratio: 1/1;
+        margin: 10px;
+        overflow: hidden;
+        border-radius: 4px;
+        display: block;
+        position: relative;
+        background: none;
+        border: none;
+    }
+    .outcropContainer>.artifactImgWrap>img{
+        position: absolute;
+        width: inherit;
+        top: 0;
+        left: 0;
+    }
 </style>
 <div class="outerDomainSelectionWrapper">
     <div class=innerDomainSelectionWrapper>
@@ -143,8 +189,8 @@
             </div>
             <img class=domainImageWrap src="{showingDomainInfo.img}" alt="">
             <div class=domain_artifacts_info_cards_wrapper>
-            {#each Object.entries(showingDomainInfo.artifactSets) as [rarity, artifactNames]}
-                    {#each artifactNames as name}
+            {#each Object.keys(showingDomainInfo.artifactSets) as rarity}
+                    {#each showingDomainInfo.artifactSets[rarity] as name}
                         <div class=artifact_card on:mouseenter={()=>showArtifactInfo(String(name))} on:mouseleave={()=>clearArtifactInfo()}>
                             <img src={`./genshin-assets/Misc/Glows/${rarity}_star_background.png`} alt="">
                             <img src="{`./genshin-assets/Artifacts/${String(name).replace(/[^\w\s-]+/gi, '').toLowerCase().replaceAll(' ', '_')}_flower.png`}" alt="">
@@ -155,7 +201,30 @@
         </div>
     </div>
 </div>
-<InfoView/>
+<!-- <InfoView/> -->
 <div class="artifactFarmSectionWrap">
-    <button class=FarmButton on:click={farmArtifacts}>Generate artifact</button>
+    <button class=FarmButton on:click|self={farmArtifacts}>Generate artifact</button>
 </div>
+
+{#if lastOutcrop && !artifactPreview}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="outcropViewWrap" on:click|self="{()=>{lastOutcrop = null}}"></div>
+{/if}
+
+{#if lastOutcrop}
+    <div class="outcropContainer" in:slide out:slide>
+        {#each lastOutcrop as artifact}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <div class="artifactImgWrap" on:click="{()=>{showPreviewArtifact(artifact)}}">
+                <img src={`./genshin-assets/Misc/Glows/${artifact.rarity}_star_background.png`} alt="">
+                <img src="{`./genshin-assets/Artifacts/${String(artifact.setName).replace(/[^\w\s-]+/gi, '').toLowerCase().replaceAll(' ', '_')}_${artifact.pieceType.toLowerCase()}.png`}" alt="">
+            </div>
+        {/each}
+    </div>
+{/if}
+
+{#if artifactPreview}
+ <!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="outcropViewWrap" on:click|self="{()=>{artifactPreview = null}}"></div>
+    <ArtifactView artifact={artifactPreview} />
+{/if}
