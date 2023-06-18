@@ -20,7 +20,7 @@ export const dataSheet = {
             'ATK%':     0.2666,
             'DEF%':     0.2666,
             ER:         0.1,
-            EN:         0.1,
+            EM:         0.1,
         },
         Goblet: {
             'HP%':      0.1925,

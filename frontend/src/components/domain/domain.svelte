@@ -3,6 +3,7 @@
     import ArtifactView from "../artifacts/artifactView.svelte";
     import { dataSheet } from "../dataSheet";
     import {slide} from "svelte/transition";
+    import {artifactsInventory} from '../../artifactStore';
 
     let lastOutcrop: null | Artifact[] = null;
     let artifactPreview: null | Artifact = null;
@@ -24,7 +25,10 @@
         const tmpArr = [];
         for(const [tier, artifacts] of Object.entries(farmReturn)){
             console.log(`Rarity: ${tier}`);
-            for(const artifact of artifacts) tmpArr.push(artifact);
+            for(const artifact of artifacts) {
+                tmpArr.push(artifact);
+                $artifactsInventory = [...$artifactsInventory, artifact];
+            }
         }
         lastOutcrop = tmpArr.sort((a, b)=>{
             return a.rarity > b.rarity ? -1 : 1;
@@ -134,7 +138,8 @@
         display: flex;
         align-items: center;
         flex-direction: column;
-        margin-top: 20px;
+        background-color: rgb(74, 78, 100);
+        padding: 18px;
     }
     .FarmButton{
         font-size: 1.5rem;
@@ -200,11 +205,12 @@
             </div>
         </div>
     </div>
+    <!-- <InfoView/> -->
+    <div class="artifactFarmSectionWrap">
+        <button class=FarmButton on:click|self={farmArtifacts}>Generate artifact</button>
+    </div>
 </div>
-<!-- <InfoView/> -->
-<div class="artifactFarmSectionWrap">
-    <button class=FarmButton on:click|self={farmArtifacts}>Generate artifact</button>
-</div>
+
 
 {#if lastOutcrop && !artifactPreview}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -224,7 +230,7 @@
 {/if}
 
 {#if artifactPreview}
- <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="outcropViewWrap" on:click|self="{()=>{artifactPreview = null}}"></div>
-    <ArtifactView artifact={artifactPreview} />
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="outcropViewWrap" on:click|self="{()=>{artifactPreview = null}}"></div>
+    <ArtifactView artifact={artifactPreview}/>
 {/if}

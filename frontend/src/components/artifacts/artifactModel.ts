@@ -37,6 +37,7 @@ export class Artifact{
             //we then start adding up all the individual chances into {mainStatOptionChecked} that keeps track of the progress 
             let mainStatOptionChecked = 0;
             for(const [option, chance] of Object.entries<number>(mainStatsOptions)){
+                if(option === 'EN') alert(JSON.stringify(mainStatsOptions));
                 mainStatOptionChecked += chance;
                 if(mainStatDice <= mainStatOptionChecked){
                     this._mainstatType = option; break; //{mainStatOptionChecked} finally reached up to the diece so {option} is the mainstat option
