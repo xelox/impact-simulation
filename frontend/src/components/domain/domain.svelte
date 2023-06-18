@@ -179,6 +179,14 @@
         top: 0;
         left: 0;
     }
+    .previewArtifactElement{
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
+        background-color: red;
+    }
 </style>
 <div class="outerDomainSelectionWrapper">
     <div class=innerDomainSelectionWrapper>
@@ -232,5 +240,5 @@
 {#if artifactPreview}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="outcropViewWrap" on:click|self="{()=>{artifactPreview = null}}"></div>
-    <ArtifactView artifact={artifactPreview}/>
+    <div class="previewArtifactElement"><ArtifactView artifact={artifactPreview}/></div>
 {/if}

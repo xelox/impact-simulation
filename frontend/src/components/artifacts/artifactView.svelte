@@ -6,9 +6,12 @@
     export let artifact: Artifact;
     let info = artifact.serialized();
 
-    $: if(artifact){
+    $: if(artifact.getLevel()){
         info = artifact.serialized();
     }
+
+    export let onChange = null;
+    export let levelup = false;
     
 </script>
 
@@ -16,7 +19,6 @@
     main{
         background-color: rgb(243, 239, 202);
         color: white;
-        position: absolute;
         max-width: max-content;
         width: 300px;
     }
@@ -51,13 +53,25 @@
     .pieceComboDescWrap{
         padding: 8px;
     }
+    .levelUpBtn{
+        background-color: green;
+        padding: 4px;
+        margin: 24px;
+        border-radius: 4px;
+        -webkit-user-select: none; /* Safari */        
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+/Edge */
+        user-select: none; /* Standard */
+        cursor: pointer;
+
+    }
 </style>
 
-<main in:slide out:slide>
+<main>
     <h2>{artifact.setName}</h2>
     <div class="bgImgWrap" style="background-image: url({`./genshin-assets/Misc/Glows/${artifact.rarity}_star_background.png`});">
         <div class="lhs">
-            <b style="font-size: 1.4rem">{artifact.pieceType}</b>
+            <span><b style="font-size: 1.4rem">{artifact.pieceType}</b> +{artifact.getLevel()}</span>
             <div class="second">
                 <p style="opacity: 0.6">{info.mainstatType}</p>
                 <p style="font-size: 2.4rem">{info.mainstatValue}{info.mainstatType.charAt(info.mainstatType.length - 1) === '%' ? '%' : ''}</p>
@@ -77,4 +91,9 @@
             </div>
         {/each}
     </div>
+
+    {#if levelup}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <span class="levelUpBtn" on:click={()=>{artifact.upgradeArtifactOnce(); onChange();}}>Level Up +1</span>
+    {/if}
 </main>

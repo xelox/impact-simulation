@@ -129,7 +129,8 @@ export class Artifact{
     /**
      * Increses the level of the artifact {this.lvl} and if the new level it's (0, 4, 8, 12, 16 or 20) will also upgrade a substat.
      */
-    private upgradeArtifactOnce = () => {
+    public upgradeArtifactOnce = () => {
+        if(this._lvl === 20) return;
         this._lvl++;
         const mainstatTypeForValue = (['PYRO','ELECTRO','CRYO','HYDRO','DENDRO','ANEMO','GEO'].includes(this._mainstatType)) ? 'ELEMENTAL_DMG' : this._mainstatType;
         this._mainstatValue = dataSheet.mainStatLvlTable[mainstatTypeForValue][this._lvl];
@@ -139,6 +140,7 @@ export class Artifact{
             }
             else this.upgradeRandomSubstat();
         }
+        console.log('level up done');
     }
     public isMaxLvl = () => { return this._lvl === 20}
     public giveExp = (expPieces: Number[]) => {
@@ -148,6 +150,7 @@ export class Artifact{
         //     this.upgradeOnce();
         // }
     }
+    public getLevel = () => { return this._lvl; }
 
     public serialized = () => {
         const serialSubstats: Array<{type: String, value: number}> = [];

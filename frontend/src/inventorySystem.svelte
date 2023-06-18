@@ -6,6 +6,8 @@
 
     let artifactPreview: null | Artifact = null;
 
+    const previewChanged = () => artifactPreview = artifactPreview;
+
     const showPreviewArtifact = (artifact: Artifact) => {
         artifactPreview = artifact;
     }
@@ -52,6 +54,14 @@
         top: 0;
         left: 0;
     }
+    /* .levelSpan{
+        position: absolute;
+        color: white;
+        font-size: 1rem;
+        bottom: 0;
+        right: 0;
+        z-index: 2;
+    } */
 </style>
 
 <main>
@@ -59,6 +69,7 @@
         {#each sortedArr as artifact}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="artifactImgWrap" on:click="{()=>{showPreviewArtifact(artifact)}}">
+                <!-- <span class=levelSpan>{artifact.getLevel()}</span> -->
                 <img src={`./genshin-assets/Misc/Glows/${artifact.rarity}_star_background.png`} alt="">
                 <img src="{`./genshin-assets/Artifacts/${String(artifact.setName).replace(/[^\w\s-]+/gi, '').toLowerCase().replaceAll(' ', '_')}_${artifact.pieceType.toLowerCase()}.png`}" alt="">
             </div>
@@ -67,7 +78,7 @@
    
     <div class="previewWrap">
         {#if artifactPreview}
-            <ArtifactView artifact={artifactPreview}/>
+            <ArtifactView artifact={artifactPreview} levelup={true} onChange={previewChanged}/>
         {/if}
     </div>
 
